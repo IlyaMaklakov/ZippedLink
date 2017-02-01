@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5E31877C
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ZippedLink.Web", "ZippedLink.Web\ZippedLink.Web.xproj", "{2B3B7B8C-8D0C-43A2-8A6B-4134225767EF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{B6818911-CF8F-4D79-BED8-3234DC1FFB2A}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MyCoreFramework", "MyCoreFramework\MyCoreFramework.xproj", "{9526BDBB-6A10-4C72-BE91-31A5575913FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,8 +39,15 @@ Global
 		{2B3B7B8C-8D0C-43A2-8A6B-4134225767EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B3B7B8C-8D0C-43A2-8A6B-4134225767EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B3B7B8C-8D0C-43A2-8A6B-4134225767EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9526BDBB-6A10-4C72-BE91-31A5575913FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9526BDBB-6A10-4C72-BE91-31A5575913FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9526BDBB-6A10-4C72-BE91-31A5575913FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9526BDBB-6A10-4C72-BE91-31A5575913FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9526BDBB-6A10-4C72-BE91-31A5575913FA} = {B6818911-CF8F-4D79-BED8-3234DC1FFB2A}
 	EndGlobalSection
 EndGlobal
