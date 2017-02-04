@@ -1,14 +1,36 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
+using System.Linq.Expressions;
 using System.Reflection;
 
+using Castle.MicroKernel.Registration;
+
+using MyCoreFramework.Application.Features;
+using MyCoreFramework.Application.Navigation;
 using MyCoreFramework.Application.Services;
+using MyCoreFramework.Auditing;
+using MyCoreFramework.Authorization;
+using MyCoreFramework.BackgroundJobs;
+using MyCoreFramework.Collections.Extensions;
+using MyCoreFramework.Configuration;
+using MyCoreFramework.Configuration.Startup;
 using MyCoreFramework.Dependency;
 using MyCoreFramework.Domain.Uow;
+using MyCoreFramework.Events.Bus;
+using MyCoreFramework.Localization;
+using MyCoreFramework.Localization.Dictionaries;
+using MyCoreFramework.Localization.Dictionaries.Xml;
 using MyCoreFramework.Modules;
+using MyCoreFramework.MultiTenancy;
+using MyCoreFramework.Net.Mail;
+using MyCoreFramework.Notifications;
 using MyCoreFramework.Runtime;
+using MyCoreFramework.Runtime.Caching;
 using MyCoreFramework.Runtime.Remoting;
+using MyCoreFramework.Runtime.Validation.Interception;
+using MyCoreFramework.Threading;
+using MyCoreFramework.Threading.BackgroundWorkers;
+using MyCoreFramework.Timing;
 
 namespace MyCoreFramework
 {
@@ -16,35 +38,35 @@ namespace MyCoreFramework
     /// Kernel (core) module of the ABP system.
     /// No need to depend on this, it's automatically the first module always.
     /// </summary>
-    public sealed class AbpKernelModule : MyModule
+    public sealed class AbpKernelModule : AbpModule
     {
         public override void PreInitialize()
         {
-            IocManager.AddConventionalRegistrar(new BasicConventionalRegistrar());
+            this.IocManager.AddConventionalRegistrar(new BasicConventionalRegistrar());
 
-            IocManager.Register<IScopedIocResolver, ScopedIocResolver>(DependencyLifeStyle.Transient);
-            IocManager.Register(typeof(IAmbientScopeProvider<>), typeof(DataContextAmbientScopeProvider<>), DependencyLifeStyle.Transient);
+            this.IocManager.Register<IScopedIocResolver, ScopedIocResolver>(DependencyLifeStyle.Transient);
+            this.IocManager.Register(typeof(IAmbientScopeProvider<>), typeof(DataContextAmbientScopeProvider<>), DependencyLifeStyle.Transient);
 
-            InitializeInterceptors();
+            this.InitializeInterceptors();
 
-            AddAuditingSelectors();
-            AddLocalizationSources();
-            AddSettingProviders();
-            AddUnitOfWorkFilters();
-            ConfigureCaches();
-            AddIgnoredTypes();
+            this.AddAuditingSelectors();
+            this.AddLocalizationSources();
+            this.AddSettingProviders();
+            this.AddUnitOfWorkFilters();
+            this.ConfigureCaches();
+            this.AddIgnoredTypes();
         }
 
         public override void Initialize()
         {
-            foreach (var replaceAction in ((StartupConfiguration)Configuration).ServiceReplaceActions.Values)
+            foreach (var replaceAction in ((AbpStartupConfiguration)this.Configuration).ServiceReplaceActions.Values)
             {
                 replaceAction();
             }
 
-            IocManager.IocContainer.Install(new EventBusInstaller(IocManager));
+            this.IocManager.IocContainer.Install(new EventBusInstaller(this.IocManager));
 
-            IocManager.RegisterAssemblyByConvention(Assembly.GetExecutingAssembly(),
+            this.IocManager.RegisterAssemblyByConvention(Assembly.GetExecutingAssembly(),
                 new ConventionalRegistrationConfig
                 {
                     InstallInstallers = false
@@ -53,53 +75,57 @@ namespace MyCoreFramework
 
         public override void PostInitialize()
         {
-            RegisterMissingComponents();
+            this.RegisterMissingComponents();
 
-            IocManager.Resolve<SettingDefinitionManager>().Initialize();
-            IocManager.Resolve<FeatureManager>().Initialize();
-            IocManager.Resolve<PermissionManager>().Initialize();
-            IocManager.Resolve<LocalizationManager>().Initialize();
-            IocManager.Resolve<NotificationDefinitionManager>().Initialize();
-            IocManager.Resolve<NavigationManager>().Initialize();
+            this.IocManager.Resolve<SettingDefinitionManager>().Initialize();
+            this.IocManager.Resolve<FeatureManager>().Initialize();
+            this.IocManager.Resolve<PermissionManager>().Initialize();
+            this.IocManager.Resolve<LocalizationManager>().Initialize();
+            this.IocManager.Resolve<NotificationDefinitionManager>().Initialize();
+            this.IocManager.Resolve<NavigationManager>().Initialize();
 
-            if (Configuration.BackgroundJobs.IsJobExecutionEnabled)
+            if (this.Configuration.BackgroundJobs.IsJobExecutionEnabled)
             {
-                var workerManager = IocManager.Resolve<IBackgroundWorkerManager>();
+                var workerManager = this.IocManager.Resolve<IBackgroundWorkerManager>();
                 workerManager.Start();
-                workerManager.Add(IocManager.Resolve<IBackgroundJobManager>());
+                workerManager.Add(this.IocManager.Resolve<IBackgroundJobManager>());
             }
         }
 
         public override void Shutdown()
         {
+            if (this.Configuration.BackgroundJobs.IsJobExecutionEnabled)
+            {
+                this.IocManager.Resolve<IBackgroundWorkerManager>().StopAndWaitToStop();
+            }
         }
 
         private void InitializeInterceptors()
         {
-            ValidationInterceptorRegistrar.Initialize(IocManager);
-            AuditingInterceptorRegistrar.Initialize(IocManager);
-            UnitOfWorkRegistrar.Initialize(IocManager);
-            AuthorizationInterceptorRegistrar.Initialize(IocManager);
+            ValidationInterceptorRegistrar.Initialize(this.IocManager);
+            AuditingInterceptorRegistrar.Initialize(this.IocManager);
+            UnitOfWorkRegistrar.Initialize(this.IocManager);
+            AuthorizationInterceptorRegistrar.Initialize(this.IocManager);
         }
 
         private void AddUnitOfWorkFilters()
         {
-            Configuration.UnitOfWork.RegisterFilter(MyCoreDataFilters.SoftDelete, true);
-            Configuration.UnitOfWork.RegisterFilter(MyCoreDataFilters.MustHaveTenant, true);
-            Configuration.UnitOfWork.RegisterFilter(MyCoreDataFilters.MayHaveTenant, true);
+            this.Configuration.UnitOfWork.RegisterFilter(AbpDataFilters.SoftDelete, true);
+            this.Configuration.UnitOfWork.RegisterFilter(AbpDataFilters.MustHaveTenant, true);
+            this.Configuration.UnitOfWork.RegisterFilter(AbpDataFilters.MayHaveTenant, true);
         }
 
         private void AddSettingProviders()
         {
-            Configuration.Settings.Providers.Add<LocalizationSettingProvider>();
-            Configuration.Settings.Providers.Add<EmailSettingProvider>();
-            Configuration.Settings.Providers.Add<NotificationSettingProvider>();
-            Configuration.Settings.Providers.Add<TimingSettingProvider>();
+            this.Configuration.Settings.Providers.Add<LocalizationSettingProvider>();
+            this.Configuration.Settings.Providers.Add<EmailSettingProvider>();
+            this.Configuration.Settings.Providers.Add<NotificationSettingProvider>();
+            this.Configuration.Settings.Providers.Add<TimingSettingProvider>();
         }
 
         private void AddAuditingSelectors()
         {
-            Configuration.Auditing.Selectors.Add(
+            this.Configuration.Auditing.Selectors.Add(
                 new NamedTypeSelector(
                     "Abp.ApplicationServices",
                     type => typeof(IApplicationService).IsAssignableFrom(type)
@@ -109,9 +135,9 @@ namespace MyCoreFramework
 
         private void AddLocalizationSources()
         {
-            Configuration.Localization.Sources.Add(
+            this.Configuration.Localization.Sources.Add(
                 new DictionaryBasedLocalizationSource(
-                    AbpConsts.LocalizationSourceName,
+                    MyCoreConsts.LocalizationSourceName,
                     new XmlEmbeddedFileLocalizationDictionaryProvider(
                         Assembly.GetExecutingAssembly(), "Abp.Localization.Sources.AbpXmlSource"
                     )));
@@ -119,17 +145,17 @@ namespace MyCoreFramework
 
         private void ConfigureCaches()
         {
-            Configuration.Caching.Configure(AbpCacheNames.ApplicationSettings, cache =>
+            this.Configuration.Caching.Configure(AbpCacheNames.ApplicationSettings, cache =>
             {
                 cache.DefaultSlidingExpireTime = TimeSpan.FromHours(8);
             });
 
-            Configuration.Caching.Configure(AbpCacheNames.TenantSettings, cache =>
+            this.Configuration.Caching.Configure(AbpCacheNames.TenantSettings, cache =>
             {
                 cache.DefaultSlidingExpireTime = TimeSpan.FromMinutes(60);
             });
 
-            Configuration.Caching.Configure(AbpCacheNames.UserSettings, cache =>
+            this.Configuration.Caching.Configure(AbpCacheNames.UserSettings, cache =>
             {
                 cache.DefaultSlidingExpireTime = TimeSpan.FromMinutes(20);
             });
@@ -145,45 +171,45 @@ namespace MyCoreFramework
 
             foreach (var ignoredType in commonIgnoredTypes)
             {
-                Configuration.Auditing.IgnoredTypes.AddIfNotContains(ignoredType);
-                Configuration.Validation.IgnoredTypes.AddIfNotContains(ignoredType);
+                this.Configuration.Auditing.IgnoredTypes.AddIfNotContains(ignoredType);
+                this.Configuration.Validation.IgnoredTypes.AddIfNotContains(ignoredType);
             }
 
             var validationIgnoredTypes = new[] { typeof(Type) };
             foreach (var ignoredType in validationIgnoredTypes)
             {
-                Configuration.Validation.IgnoredTypes.AddIfNotContains(ignoredType);
+                this.Configuration.Validation.IgnoredTypes.AddIfNotContains(ignoredType);
             }
         }
 
         private void RegisterMissingComponents()
         {
-            if (!IocManager.IsRegistered<IGuidGenerator>())
+            if (!this.IocManager.IsRegistered<IGuidGenerator>())
             {
-                IocManager.IocContainer.Register(
+                this.IocManager.IocContainer.Register(
                     Component
                         .For<IGuidGenerator, SequentialGuidGenerator>()
                         .Instance(SequentialGuidGenerator.Instance)
                 );
             }
 
-            IocManager.RegisterIfNot<IUnitOfWork, NullUnitOfWork>(DependencyLifeStyle.Transient);
-            IocManager.RegisterIfNot<IAuditingStore, SimpleLogAuditingStore>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<IPermissionChecker, NullPermissionChecker>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<IRealTimeNotifier, NullRealTimeNotifier>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<INotificationStore, NullNotificationStore>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<IUnitOfWorkFilterExecuter, NullUnitOfWorkFilterExecuter>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<IClientInfoProvider, NullClientInfoProvider>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<ITenantStore, NullTenantStore>(DependencyLifeStyle.Singleton);
-            IocManager.RegisterIfNot<ITenantResolverCache, NullTenantResolverCache>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<IUnitOfWork, NullUnitOfWork>(DependencyLifeStyle.Transient);
+            this.IocManager.RegisterIfNot<IAuditingStore, SimpleLogAuditingStore>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<IPermissionChecker, NullPermissionChecker>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<IRealTimeNotifier, NullRealTimeNotifier>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<INotificationStore, NullNotificationStore>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<IUnitOfWorkFilterExecuter, NullUnitOfWorkFilterExecuter>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<IClientInfoProvider, NullClientInfoProvider>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<ITenantStore, NullTenantStore>(DependencyLifeStyle.Singleton);
+            this.IocManager.RegisterIfNot<ITenantResolverCache, NullTenantResolverCache>(DependencyLifeStyle.Singleton);
 
-            if (Configuration.BackgroundJobs.IsJobExecutionEnabled)
+            if (this.Configuration.BackgroundJobs.IsJobExecutionEnabled)
             {
-                IocManager.RegisterIfNot<IBackgroundJobStore, InMemoryBackgroundJobStore>(DependencyLifeStyle.Singleton);
+                this.IocManager.RegisterIfNot<IBackgroundJobStore, InMemoryBackgroundJobStore>(DependencyLifeStyle.Singleton);
             }
             else
             {
-                IocManager.RegisterIfNot<IBackgroundJobStore, NullBackgroundJobStore>(DependencyLifeStyle.Singleton);
+                this.IocManager.RegisterIfNot<IBackgroundJobStore, NullBackgroundJobStore>(DependencyLifeStyle.Singleton);
             }
         }
     }

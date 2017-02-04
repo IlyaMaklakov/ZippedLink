@@ -12,7 +12,7 @@ namespace MyCoreFramework.MultiTenancy
         /// Tenant side.
         /// </summary>
         Tenant = 1,
-
+        
         /// <summary>
         /// Host (tenancy owner) side.
         /// </summary>

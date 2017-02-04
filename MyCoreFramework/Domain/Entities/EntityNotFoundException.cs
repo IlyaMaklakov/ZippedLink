@@ -7,7 +7,7 @@ namespace MyCoreFramework.Domain.Entities
     /// This exception is thrown if an entity excepted to be found but not found.
     /// </summary>
     [Serializable]
-    public class EntityNotFoundException : MyCoreException
+    public class EntityNotFoundException : AbpException
     {
         /// <summary>
         /// Type of the entity.
@@ -35,7 +35,7 @@ namespace MyCoreFramework.Domain.Entities
         {
 
         }
-
+        
         /// <summary>
         /// Creates a new <see cref="EntityNotFoundException"/> object.
         /// </summary>
@@ -51,8 +51,8 @@ namespace MyCoreFramework.Domain.Entities
         public EntityNotFoundException(Type entityType, object id, Exception innerException)
             : base($"There is no such an entity. Entity type: {entityType.FullName}, id: {id}", innerException)
         {
-            EntityType = entityType;
-            Id = id;
+            this.EntityType = entityType;
+            this.Id = id;
         }
 
         /// <summary>

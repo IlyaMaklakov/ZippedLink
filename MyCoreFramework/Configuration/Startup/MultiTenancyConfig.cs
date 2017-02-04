@@ -18,7 +18,7 @@ namespace MyCoreFramework.Configuration.Startup
 
         public MultiTenancyConfig()
         {
-            Resolvers = new TypeList<ITenantResolveContributer>();
+            this.Resolvers = new TypeList<ITenantResolveContributer>();
         }
     }
 }

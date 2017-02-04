@@ -28,7 +28,7 @@ namespace MyCoreFramework.Configuration
 
         /// <summary>
         /// Scopes of this setting.
-        /// Default value: <see cref="MediaTypeNames.Application"/>.
+        /// Default value: <see cref="MyCoreFramework.Configuration.SettingScopes.Application"/>.
         /// </summary>
         public SettingScopes Scopes { get; set; }
 
@@ -68,18 +68,18 @@ namespace MyCoreFramework.Configuration
         /// <param name="displayName">Display name of the permission</param>
         /// <param name="group">Group of this setting</param>
         /// <param name="description">A brief description for this setting</param>
-        /// <param name="scopes">Scopes of this setting. Default value: <see cref="MediaTypeNames.Application"/>.</param>
+        /// <param name="scopes">Scopes of this setting. Default value: <see cref="MyCoreFramework.Configuration.SettingScopes.Application"/>.</param>
         /// <param name="isVisibleToClients">Can clients see this setting and it's value. Default: false</param>
         /// <param name="isInherited">Is this setting inherited from parent scopes. Default: True.</param>
         /// <param name="customData">Can be used to store a custom object related to this setting</param>
         public SettingDefinition(
-            string name,
-            string defaultValue,
-            ILocalizableString displayName = null,
-            SettingDefinitionGroup group = null,
-            ILocalizableString description = null,
-            SettingScopes scopes = SettingScopes.Application,
-            bool isVisibleToClients = false,
+            string name, 
+            string defaultValue, 
+            ILocalizableString displayName = null, 
+            SettingDefinitionGroup group = null, 
+            ILocalizableString description = null, 
+            SettingScopes scopes = SettingScopes.Application, 
+            bool isVisibleToClients = false, 
             bool isInherited = true,
             object customData = null)
         {

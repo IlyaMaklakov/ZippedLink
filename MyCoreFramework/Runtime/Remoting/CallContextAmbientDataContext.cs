@@ -1,9 +1,10 @@
-﻿using System.Runtime.Remoting.Messaging;
+using System.Runtime.Remoting.Messaging;
 
 using MyCoreFramework.Dependency;
 
 namespace MyCoreFramework.Runtime.Remoting
 {
+    //TODO: We can switch to AsyncLocal once we support .Net 4.6.1.
     public class CallContextAmbientDataContext : IAmbientDataContext, ISingletonDependency
     {
         public void SetData(string key, object value)

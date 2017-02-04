@@ -1,4 +1,4 @@
-﻿namespace MyCoreFramework.Localization
+namespace MyCoreFramework.Localization
 {
     /// <summary>
     /// Localization context.

@@ -20,7 +20,7 @@ namespace MyCoreFramework.Modules
         /// <param name="dependedModuleTypes">Types of depended modules</param>
         public DependsOnAttribute(params Type[] dependedModuleTypes)
         {
-            DependedModuleTypes = dependedModuleTypes;
+            this.DependedModuleTypes = dependedModuleTypes;
         }
     }
 }

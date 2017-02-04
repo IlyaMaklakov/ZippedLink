@@ -62,7 +62,7 @@ namespace MyCoreFramework.Collections.Extensions
 
             return dictionary[key] = factory(key);
         }
-
+        
         /// <summary>
         /// Gets a value from the dictionary with given key. Returns default value if can not find.
         /// </summary>

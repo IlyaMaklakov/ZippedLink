@@ -14,37 +14,37 @@ namespace MyCoreFramework.Domain.Uow
     {
         public const string DidNotCallCompleteMethodExceptionMessage = "Did not call Complete method of a unit of work.";
 
-        private volatile bool isCompleteCalled;
-        private volatile bool isDisposed;
+        private volatile bool _isCompleteCalled;
+        private volatile bool _isDisposed;
 
         public void Complete()
         {
-            this.isCompleteCalled = true;
+            this._isCompleteCalled = true;
         }
 
         public Task CompleteAsync()
         {
-            this.isCompleteCalled = true;
+            this._isCompleteCalled = true;
             return Task.FromResult(0);
         }
 
         public void Dispose()
         {
-            if (this.isDisposed)
+            if (this._isDisposed)
             {
                 return;
             }
 
-            this.isDisposed = true;
+            this._isDisposed = true;
 
-            if (!this.isCompleteCalled)
+            if (!this._isCompleteCalled)
             {
                 if (HasException())
                 {
                     return;
                 }
 
-                throw new MyCoreException(DidNotCallCompleteMethodExceptionMessage);
+                throw new AbpException(DidNotCallCompleteMethodExceptionMessage);
             }
         }
         

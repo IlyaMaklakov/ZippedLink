@@ -1,4 +1,4 @@
-ï»¿namespace MyCoreFramework.Localization
+namespace MyCoreFramework.Localization
 {
     /// <summary>
     /// Represents an available language for the application.
@@ -14,7 +14,7 @@
 
         /// <summary>
         /// Display name of the language in it's original language.
-        /// Ex: "English" for English, "TÑŒrkÐ·e" for Turkish.
+        /// Ex: "English" for English, "Türkçe" for Turkish.
         /// </summary>
         public string DisplayName { get; set; }
 
@@ -38,7 +38,7 @@
         /// </param>
         /// <param name="displayName">
         /// Display name of the language in it's original language.
-        /// Ex: "English" for English, "TÑŒrkÐ·e" for Turkish.
+        /// Ex: "English" for English, "Türkçe" for Turkish.
         /// </param>
         /// <param name="icon">An icon can be set to display on the UI</param>
         /// <param name="isDefault">Is this the default language?</param>

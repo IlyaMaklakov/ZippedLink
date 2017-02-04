@@ -20,7 +20,7 @@ namespace MyCoreFramework.Reflection.Extensions
         {
             if (memberInfo == null)
             {
-                throw new ArgumentNullException(nameof(memberInfo));
+                throw new ArgumentNullException("memberInfo");
             }
 
             var attrs = memberInfo.GetCustomAttributes(typeof(TAttribute), inherit);

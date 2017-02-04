@@ -36,9 +36,9 @@ namespace MyCoreFramework.Domain.Uow
         /// <inheritdoc/>
         public IReadOnlyList<DataFilterConfiguration> Filters
         {
-            get { return this.filters.ToImmutableList(); }
+            get { return this._filters.ToImmutableList(); }
         }
-        private readonly List<DataFilterConfiguration> filters;
+        private readonly List<DataFilterConfiguration> _filters;
 
         /// <summary>
         /// Gets default UOW options.
@@ -58,31 +58,31 @@ namespace MyCoreFramework.Domain.Uow
         /// <summary>
         /// Reference to current ABP session.
         /// </summary>
-        public ISession AbpSession { protected get; set; }
+        public IAbpSession AbpSession { protected get; set; }
 
         protected IUnitOfWorkFilterExecuter FilterExecuter { get; }
 
         /// <summary>
         /// Is <see cref="Begin"/> method called before?
         /// </summary>
-        private bool isBeginCalledBefore;
+        private bool _isBeginCalledBefore;
 
         /// <summary>
         /// Is <see cref="Complete"/> method called before?
         /// </summary>
-        private bool isCompleteCalledBefore;
+        private bool _isCompleteCalledBefore;
 
         /// <summary>
         /// Is this unit of work successfully completed.
         /// </summary>
-        private bool succeed;
+        private bool _succeed;
 
         /// <summary>
         /// A reference to the exception if this unit of work failed.
         /// </summary>
-        private Exception exception;
+        private Exception _exception;
 
-        private int? tenantId;
+        private int? _tenantId;
 
         /// <summary>
         /// Constructor.
@@ -97,7 +97,7 @@ namespace MyCoreFramework.Domain.Uow
             this.ConnectionStringResolver = connectionStringResolver;
 
             this.Id = Guid.NewGuid().ToString("N");
-            this.filters = defaultOptions.Filters.ToList();
+            this._filters = defaultOptions.Filters.ToList();
 
             this.AbpSession = NullAbpSession.Instance;
         }
@@ -133,10 +133,10 @@ namespace MyCoreFramework.Domain.Uow
             foreach (var filterName in filterNames)
             {
                 var filterIndex = this.GetFilterIndex(filterName);
-                if (this.filters[filterIndex].IsEnabled)
+                if (this._filters[filterIndex].IsEnabled)
                 {
                     disabledFilters.Add(filterName);
-                    this.filters[filterIndex] = new DataFilterConfiguration(this.filters[filterIndex], false);
+                    this._filters[filterIndex] = new DataFilterConfiguration(this._filters[filterIndex], false);
                 }
             }
 
@@ -155,10 +155,10 @@ namespace MyCoreFramework.Domain.Uow
             foreach (var filterName in filterNames)
             {
                 var filterIndex = this.GetFilterIndex(filterName);
-                if (!this.filters[filterIndex].IsEnabled)
+                if (!this._filters[filterIndex].IsEnabled)
                 {
                     enabledFilters.Add(filterName);
-                    this.filters[filterIndex] = new DataFilterConfiguration(this.filters[filterIndex], true);
+                    this._filters[filterIndex] = new DataFilterConfiguration(this._filters[filterIndex], true);
                 }
             }
 
@@ -178,7 +178,7 @@ namespace MyCoreFramework.Domain.Uow
         {
             var filterIndex = this.GetFilterIndex(filterName);
 
-            var newfilter = new DataFilterConfiguration(this.filters[filterIndex]);
+            var newfilter = new DataFilterConfiguration(this._filters[filterIndex]);
 
             //Store old value
             object oldValue = null;
@@ -190,7 +190,7 @@ namespace MyCoreFramework.Domain.Uow
 
             newfilter.FilterParameters[parameterName] = value;
 
-            this.filters[filterIndex] = newfilter;
+            this._filters[filterIndex] = newfilter;
 
             this.ApplyFilterParameterValue(filterName, parameterName, value);
 
@@ -206,28 +206,28 @@ namespace MyCoreFramework.Domain.Uow
 
         public IDisposable SetTenantId(int? tenantId)
         {
-            var oldTenantId = this.tenantId;
-            this.tenantId = tenantId;
+            var oldTenantId = this._tenantId;
+            this._tenantId = tenantId;
 
             var mustHaveTenantEnableChange = tenantId == null
-                ? this.DisableFilter(MyCoreDataFilters.MustHaveTenant)
-                : this.EnableFilter(MyCoreDataFilters.MustHaveTenant);
+                ? this.DisableFilter(AbpDataFilters.MustHaveTenant)
+                : this.EnableFilter(AbpDataFilters.MustHaveTenant);
 
-            var mayHaveTenantChange = this.SetFilterParameter(MyCoreDataFilters.MayHaveTenant, MyCoreDataFilters.Parameters.TenantId, tenantId);
-            var mustHaveTenantChange = this.SetFilterParameter(MyCoreDataFilters.MustHaveTenant, MyCoreDataFilters.Parameters.TenantId, tenantId ?? 0);
+            var mayHaveTenantChange = this.SetFilterParameter(AbpDataFilters.MayHaveTenant, AbpDataFilters.Parameters.TenantId, tenantId);
+            var mustHaveTenantChange = this.SetFilterParameter(AbpDataFilters.MustHaveTenant, AbpDataFilters.Parameters.TenantId, tenantId ?? 0);
 
             return new DisposeAction(() =>
             {
                 mayHaveTenantChange.Dispose();
                 mustHaveTenantChange.Dispose();
                 mustHaveTenantEnableChange.Dispose();
-                this.tenantId = oldTenantId;
+                this._tenantId = oldTenantId;
             });
         }
 
         public int? GetTenantId()
         {
-            return this.tenantId;
+            return this._tenantId;
         }
 
         /// <inheritdoc/>
@@ -237,12 +237,12 @@ namespace MyCoreFramework.Domain.Uow
             try
             {
                 this.CompleteUow();
-                this.succeed = true;
+                this._succeed = true;
                 this.OnCompleted();
             }
             catch (Exception ex)
             {
-                this.exception = ex;
+                this._exception = ex;
                 throw;
             }
         }
@@ -254,12 +254,12 @@ namespace MyCoreFramework.Domain.Uow
             try
             {
                 await this.CompleteUowAsync();
-                this.succeed = true;
+                this._succeed = true;
                 this.OnCompleted();
             }
             catch (Exception ex)
             {
-                this.exception = ex;
+                this._exception = ex;
                 throw;
             }
         }
@@ -267,16 +267,16 @@ namespace MyCoreFramework.Domain.Uow
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (!this.isBeginCalledBefore || this.IsDisposed)
+            if (!this._isBeginCalledBefore || this.IsDisposed)
             {
                 return;
             }
 
             this.IsDisposed = true;
 
-            if (!this.succeed)
+            if (!this._succeed)
             {
-                this.OnFailed(this.exception);
+                this.OnFailed(this._exception);
             }
 
             this.DisposeUow();
@@ -353,38 +353,38 @@ namespace MyCoreFramework.Domain.Uow
 
         private void PreventMultipleBegin()
         {
-            if (this.isBeginCalledBefore)
+            if (this._isBeginCalledBefore)
             {
-                throw new MyCoreException("This unit of work has started before. Can not call Start method more than once.");
+                throw new AbpException("This unit of work has started before. Can not call Start method more than once.");
             }
 
-            this.isBeginCalledBefore = true;
+            this._isBeginCalledBefore = true;
         }
 
         private void PreventMultipleComplete()
         {
-            if (this.isCompleteCalledBefore)
+            if (this._isCompleteCalledBefore)
             {
-                throw new MyCoreException("Complete is called before!");
+                throw new AbpException("Complete is called before!");
             }
 
-            this.isCompleteCalledBefore = true;
+            this._isCompleteCalledBefore = true;
         }
 
         private void SetFilters(List<DataFilterConfiguration> filterOverrides)
         {
-            for (var i = 0; i < this.filters.Count; i++)
+            for (var i = 0; i < this._filters.Count; i++)
             {
-                var filterOverride = filterOverrides.FirstOrDefault(f => f.FilterName == this.filters[i].FilterName);
+                var filterOverride = filterOverrides.FirstOrDefault(f => f.FilterName == this._filters[i].FilterName);
                 if (filterOverride != null)
                 {
-                    this.filters[i] = filterOverride;
+                    this._filters[i] = filterOverride;
                 }
             }
 
             if (this.AbpSession.TenantId == null)
             {
-                this.ChangeFilterIsEnabledIfNotOverrided(filterOverrides, MyCoreDataFilters.MustHaveTenant, false);
+                this.ChangeFilterIsEnabledIfNotOverrided(filterOverrides, AbpDataFilters.MustHaveTenant, false);
             }
         }
 
@@ -395,26 +395,26 @@ namespace MyCoreFramework.Domain.Uow
                 return;
             }
 
-            var index = this.filters.FindIndex(f => f.FilterName == filterName);
+            var index = this._filters.FindIndex(f => f.FilterName == filterName);
             if (index < 0)
             {
                 return;
             }
 
-            if (this.filters[index].IsEnabled == isEnabled)
+            if (this._filters[index].IsEnabled == isEnabled)
             {
                 return;
             }
 
-            this.filters[index] = new DataFilterConfiguration(filterName, isEnabled);
+            this._filters[index] = new DataFilterConfiguration(filterName, isEnabled);
         }
 
         private DataFilterConfiguration GetFilter(string filterName)
         {
-            var filter = this.filters.FirstOrDefault(f => f.FilterName == filterName);
+            var filter = this._filters.FirstOrDefault(f => f.FilterName == filterName);
             if (filter == null)
             {
-                throw new MyCoreException("Unknown filter name: " + filterName + ". Be sure this filter is registered before.");
+                throw new AbpException("Unknown filter name: " + filterName + ". Be sure this filter is registered before.");
             }
 
             return filter;
@@ -422,10 +422,10 @@ namespace MyCoreFramework.Domain.Uow
 
         private int GetFilterIndex(string filterName)
         {
-            var filterIndex = this.filters.FindIndex(f => f.FilterName == filterName);
+            var filterIndex = this._filters.FindIndex(f => f.FilterName == filterName);
             if (filterIndex < 0)
             {
-                throw new MyCoreException("Unknown filter name: " + filterName + ". Be sure this filter is registered before.");
+                throw new AbpException("Unknown filter name: " + filterName + ". Be sure this filter is registered before.");
             }
 
             return filterIndex;

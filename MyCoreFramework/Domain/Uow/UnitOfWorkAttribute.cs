@@ -139,7 +139,7 @@ namespace MyCoreFramework.Domain.Uow
         /// </summary>
         /// <param name="methodInfo">Method to get attribute</param>
         /// <returns>The UnitOfWorkAttribute object</returns>
-        internal static UnitOfWorkAttribute GetUnitOfWorkAttributeOrNull(MemberInfo methodInfo)
+        public static UnitOfWorkAttribute GetUnitOfWorkAttributeOrNull(MemberInfo methodInfo)
         {
             var attrs = methodInfo.GetCustomAttributes(true).OfType<UnitOfWorkAttribute>().ToArray();
             if (attrs.Length > 0)
@@ -155,7 +155,7 @@ namespace MyCoreFramework.Domain.Uow
             return null;
         }
 
-        internal UnitOfWorkOptions CreateOptions()
+        public UnitOfWorkOptions CreateOptions()
         {
             return new UnitOfWorkOptions
             {

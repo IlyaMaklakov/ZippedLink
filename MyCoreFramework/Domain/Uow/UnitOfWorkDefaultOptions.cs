@@ -28,7 +28,7 @@ namespace MyCoreFramework.Domain.Uow
         {
             if (this._filters.Any(f => f.FilterName == filterName))
             {
-                throw new MyCoreException("There is already a filter with name: " + filterName);
+                throw new AbpException("There is already a filter with name: " + filterName);
             }
 
             this._filters.Add(new DataFilterConfiguration(filterName, isEnabledByDefault));

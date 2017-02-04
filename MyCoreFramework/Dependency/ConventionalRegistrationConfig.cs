@@ -1,11 +1,11 @@
-﻿using Castle.DynamicProxy;
+using Castle.DynamicProxy;
 
 namespace MyCoreFramework.Dependency
 {
     /// <summary>
     /// This class is used to pass configuration/options while registering classes in conventional way.
     /// </summary>
-    public class ConventionalRegistrationConfig : DictionaryBasedConfig
+    public class ConventionalRegistrationConfig : Configuration.DictionaryBasedConfig
     {
         /// <summary>
         /// Install all <see cref="IInterceptor"/> implementations automatically or not.

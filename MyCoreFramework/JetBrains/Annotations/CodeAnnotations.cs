@@ -6,7 +6,7 @@ namespace MyCoreFramework.JetBrains.Annotations
         AttributeTargets.Method | AttributeTargets.Parameter |
         AttributeTargets.Property | AttributeTargets.Delegate |
         AttributeTargets.Field)]
-    internal sealed class NotNullAttribute : Attribute
+    public sealed class NotNullAttribute : Attribute
     {
     }
 
@@ -14,22 +14,22 @@ namespace MyCoreFramework.JetBrains.Annotations
         AttributeTargets.Method | AttributeTargets.Parameter |
         AttributeTargets.Property | AttributeTargets.Delegate |
         AttributeTargets.Field)]
-    internal sealed class CanBeNullAttribute : Attribute
+    public sealed class CanBeNullAttribute : Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Parameter)]
-    internal sealed class InvokerParameterNameAttribute : Attribute
+    public sealed class InvokerParameterNameAttribute : Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Parameter)]
-    internal sealed class NoEnumerationAttribute : Attribute
+    public sealed class NoEnumerationAttribute : Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    internal sealed class ContractAnnotationAttribute : Attribute
+    public sealed class ContractAnnotationAttribute : Attribute
     {
         public string Contract { get; private set; }
 
@@ -48,7 +48,7 @@ namespace MyCoreFramework.JetBrains.Annotations
     }
 
     [AttributeUsage(AttributeTargets.All)]
-    internal sealed class UsedImplicitlyAttribute : Attribute
+    public sealed class UsedImplicitlyAttribute : Attribute
     {
         public UsedImplicitlyAttribute()
             : this(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Default)
@@ -77,7 +77,7 @@ namespace MyCoreFramework.JetBrains.Annotations
     }
 
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Delegate)]
-    internal sealed class StringFormatMethodAttribute : Attribute
+    public sealed class StringFormatMethodAttribute : Attribute
     {
         public StringFormatMethodAttribute([NotNull] string formatParameterName)
         {
@@ -89,7 +89,7 @@ namespace MyCoreFramework.JetBrains.Annotations
     }
 
     [Flags]
-    internal enum ImplicitUseKindFlags
+    public enum ImplicitUseKindFlags
     {
         Default = Access | Assign | InstantiatedWithFixedConstructorSignature,
         Access = 1,
@@ -99,7 +99,7 @@ namespace MyCoreFramework.JetBrains.Annotations
     }
 
     [Flags]
-    internal enum ImplicitUseTargetFlags
+    public enum ImplicitUseTargetFlags
     {
         Default = Itself,
         Itself = 1,

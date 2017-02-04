@@ -1,6 +1,7 @@
 ﻿using System;
 
 using MyCoreFramework.Dependency;
+using MyCoreFramework.Domain.Uow;
 
 namespace MyCoreFramework.Configuration.Startup
 {

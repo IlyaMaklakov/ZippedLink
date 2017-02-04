@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace ZippedLink.Web.Controllers
+namespace ZippedLink.WebSpa.Controllers
 {
     [Route("api/[controller]")]
     public class SampleDataController : Controller

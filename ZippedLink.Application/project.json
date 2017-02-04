@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Microsoft.AspNet.Identity.Core": "2.2.1",
+    "Microsoft.AspNetCore.Identity": "1.0.0",
+    "MyCore.AutoMapper": "1.0.0-*",
+    "MyCore.EntityFramework": "1.0.0-*",
+    "NETStandard.Library": "1.6.0",
+    "ZippedLink.Core": "1.0.0-*"
+  },
+
+  "frameworks": {
+    "net461": {
+    }
+  }
+}

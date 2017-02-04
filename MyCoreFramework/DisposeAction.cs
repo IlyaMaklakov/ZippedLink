@@ -13,7 +13,7 @@ namespace MyCoreFramework
     {
         public static readonly DisposeAction Empty = new DisposeAction(null);
 
-        private Action action;
+        private Action _action;
 
         /// <summary>
         /// Creates a new <see cref="DisposeAction"/> object.
@@ -21,13 +21,13 @@ namespace MyCoreFramework
         /// <param name="action">Action to be executed when this object is disposed.</param>
         public DisposeAction([CanBeNull] Action action)
         {
-            this.action = action;
+            this._action = action;
         }
 
         public void Dispose()
         {
             // Interlocked prevents multiple execution of the _action.
-            var action = Interlocked.Exchange(ref this.action, null);
+            var action = Interlocked.Exchange(ref this._action, null);
             action?.Invoke();
         }
     }

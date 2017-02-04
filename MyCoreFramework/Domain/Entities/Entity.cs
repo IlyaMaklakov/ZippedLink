@@ -33,7 +33,7 @@ namespace MyCoreFramework.Domain.Entities
         /// <returns>True, if this entity is transient</returns>
         public virtual bool IsTransient()
         {
-            if (EqualityComparer<TPrimaryKey>.Default.Equals(Id, default(TPrimaryKey)))
+            if (EqualityComparer<TPrimaryKey>.Default.Equals(this.Id, default(TPrimaryKey)))
             {
                 return true;
             }
@@ -41,12 +41,12 @@ namespace MyCoreFramework.Domain.Entities
             //Workaround for EF Core since it sets int/long to min value when attaching to dbcontext
             if (typeof(TPrimaryKey) == typeof(int))
             {
-                return Convert.ToInt32(Id) <= 0;
+                return Convert.ToInt32(this.Id) <= 0;
             }
 
             if (typeof(TPrimaryKey) == typeof(long))
             {
-                return Convert.ToInt64(Id) <= 0;
+                return Convert.ToInt64(this.Id) <= 0;
             }
 
             return false;
@@ -68,13 +68,13 @@ namespace MyCoreFramework.Domain.Entities
 
             //Transient objects are not considered as equal
             var other = (Entity<TPrimaryKey>)obj;
-            if (IsTransient() && other.IsTransient())
+            if (this.IsTransient() && other.IsTransient())
             {
                 return false;
             }
 
             //Must have a IS-A relation of types or must be same type
-            var typeOfThis = GetType();
+            var typeOfThis = this.GetType();
             var typeOfOther = other.GetType();
             if (!typeOfThis.IsAssignableFrom(typeOfOther) && !typeOfOther.IsAssignableFrom(typeOfThis))
             {
@@ -93,13 +93,13 @@ namespace MyCoreFramework.Domain.Entities
                 return false;
             }
 
-            return Id.Equals(other.Id);
+            return this.Id.Equals(other.Id);
         }
 
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return this.Id.GetHashCode();
         }
 
         /// <inheritdoc/>
@@ -122,7 +122,7 @@ namespace MyCoreFramework.Domain.Entities
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"[{GetType().Name} {Id}]";
+            return $"[{this.GetType().Name} {this.Id}]";
         }
     }
 }

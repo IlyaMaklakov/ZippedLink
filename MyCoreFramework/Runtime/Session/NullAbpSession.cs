@@ -26,7 +26,7 @@ namespace MyCoreFramework.Runtime.Session
 
         public override int? ImpersonatorTenantId => null;
 
-        private NullAbpSession()
+        private NullAbpSession() 
             : base(new MultiTenancyConfig(), new DataContextAmbientScopeProvider<SessionOverride>(new CallContextAmbientDataContext()))
         {
 

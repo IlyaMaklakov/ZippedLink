@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -72,7 +72,7 @@ namespace MyCoreFramework.Threading
             {
                 if (finalAction != null)
                 {
-                    finalAction(exception);
+                    finalAction(exception);                    
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace MyCoreFramework.Threading
 
         public static object CallAwaitTaskWithPostActionAndFinallyAndGetResult(Type taskReturnType, object actualReturnValue, Func<Task> action, Action<Exception> finalAction)
         {
-            return typeof(InternalAsyncHelper)
+            return typeof (InternalAsyncHelper)
                 .GetMethod("AwaitTaskWithPostActionAndFinallyAndGetResult", BindingFlags.Public | BindingFlags.Static)
                 .MakeGenericMethod(taskReturnType)
                 .Invoke(null, new object[] { actualReturnValue, action, finalAction });
@@ -148,7 +148,7 @@ namespace MyCoreFramework.Threading
 
                 if (postAction != null)
                 {
-                    await postAction();
+                    await postAction();                    
                 }
 
                 return result;

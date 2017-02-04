@@ -9,20 +9,23 @@ namespace MyCoreFramework.Domain.Uow
     /// </summary>
     internal class UnitOfWorkManager : IUnitOfWorkManager, ITransientDependency
     {
-        private readonly IIocResolver iocResolver;
-        private readonly ICurrentUnitOfWorkProvider currentUnitOfWorkProvider;
-        private readonly IUnitOfWorkDefaultOptions defaultOptions;
+        private readonly IIocResolver _iocResolver;
+        private readonly ICurrentUnitOfWorkProvider _currentUnitOfWorkProvider;
+        private readonly IUnitOfWorkDefaultOptions _defaultOptions;
 
-        public IActiveUnitOfWork Current => this.currentUnitOfWorkProvider.Current;
+        public IActiveUnitOfWork Current
+        {
+            get { return this._currentUnitOfWorkProvider.Current; }
+        }
 
         public UnitOfWorkManager(
             IIocResolver iocResolver,
             ICurrentUnitOfWorkProvider currentUnitOfWorkProvider,
             IUnitOfWorkDefaultOptions defaultOptions)
         {
-            this.iocResolver = iocResolver;
-            this.currentUnitOfWorkProvider = currentUnitOfWorkProvider;
-            this.defaultOptions = defaultOptions;
+            this._iocResolver = iocResolver;
+            this._currentUnitOfWorkProvider = currentUnitOfWorkProvider;
+            this._defaultOptions = defaultOptions;
         }
 
         public IUnitOfWorkCompleteHandle Begin()
@@ -37,33 +40,33 @@ namespace MyCoreFramework.Domain.Uow
 
         public IUnitOfWorkCompleteHandle Begin(UnitOfWorkOptions options)
         {
-            options.FillDefaultsForNonProvidedOptions(this.defaultOptions);
+            options.FillDefaultsForNonProvidedOptions(this._defaultOptions);
 
-            if (options.Scope == TransactionScopeOption.Required && this.currentUnitOfWorkProvider.Current != null)
+            if (options.Scope == TransactionScopeOption.Required && this._currentUnitOfWorkProvider.Current != null)
             {
                 return new InnerUnitOfWorkCompleteHandle();
             }
 
-            var uow = this.iocResolver.Resolve<IUnitOfWork>();
+            var uow = this._iocResolver.Resolve<IUnitOfWork>();
 
             uow.Completed += (sender, args) =>
             {
-                this.currentUnitOfWorkProvider.Current = null;
+                this._currentUnitOfWorkProvider.Current = null;
             };
 
             uow.Failed += (sender, args) =>
             {
-                this.currentUnitOfWorkProvider.Current = null;
+                this._currentUnitOfWorkProvider.Current = null;
             };
 
             uow.Disposed += (sender, args) =>
             {
-                this.iocResolver.Release(uow);
+                this._iocResolver.Release(uow);
             };
 
             uow.Begin(options);
 
-            this.currentUnitOfWorkProvider.Current = uow;
+            this._currentUnitOfWorkProvider.Current = uow;
 
             return uow;
         }

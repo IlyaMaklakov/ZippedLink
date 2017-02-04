@@ -1,4 +1,3 @@
-
 using MyCoreFramework.Dependency;
 
 namespace MyCoreFramework.Domain.Repositories

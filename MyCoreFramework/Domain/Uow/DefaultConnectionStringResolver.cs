@@ -8,20 +8,20 @@ namespace MyCoreFramework.Domain.Uow
 {
     /// <summary>
     /// Default implementation of <see cref="IConnectionStringResolver"/>.
-    /// Get connection string from <see cref="IStartupConfiguration"/>,
+    /// Get connection string from <see cref="IAbpStartupConfiguration"/>,
     /// or "Default" connection string in config file,
     /// or single connection string in config file.
     /// </summary>
     public class DefaultConnectionStringResolver : IConnectionStringResolver, ITransientDependency
     {
-        private readonly IStartupConfiguration configuration;
+        private readonly IAbpStartupConfiguration _configuration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultConnectionStringResolver"/> class.
         /// </summary>
-        public DefaultConnectionStringResolver(IStartupConfiguration configuration)
+        public DefaultConnectionStringResolver(IAbpStartupConfiguration configuration)
         {
-            this.configuration = configuration;
+            this._configuration = configuration;
         }
 
         public virtual string GetNameOrConnectionString(ConnectionStringResolveArgs args)
@@ -31,7 +31,7 @@ namespace MyCoreFramework.Domain.Uow
                 throw new ArgumentNullException("args");
             }
 
-            var defaultConnectionString = this.configuration.DefaultNameOrConnectionString;
+            var defaultConnectionString = this._configuration.DefaultNameOrConnectionString;
             if (!string.IsNullOrWhiteSpace(defaultConnectionString))
             {
                 return defaultConnectionString;
@@ -47,7 +47,7 @@ namespace MyCoreFramework.Domain.Uow
                 return ConfigurationManager.ConnectionStrings[0].ConnectionString;
             }
 
-            throw new MyCoreException("Could not find a connection string definition for the application. Set IAbpStartupConfiguration.DefaultNameOrConnectionString or add a 'Default' connection string to application .config file.");
+            throw new AbpException("Could not find a connection string definition for the application. Set IAbpStartupConfiguration.DefaultNameOrConnectionString or add a 'Default' connection string to application .config file.");
         }
     }
 }

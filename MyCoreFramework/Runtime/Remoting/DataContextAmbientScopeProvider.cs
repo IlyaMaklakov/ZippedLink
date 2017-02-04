@@ -19,20 +19,20 @@ namespace MyCoreFramework.Runtime.Remoting
 
         private static readonly ConcurrentDictionary<string, ScopeItem> ScopeDictionary = new ConcurrentDictionary<string, ScopeItem>();
 
-        private readonly IAmbientDataContext dataContext;
+        private readonly IAmbientDataContext _dataContext;
 
         public DataContextAmbientScopeProvider([NotNull] IAmbientDataContext dataContext)
         {
             Check.NotNull(dataContext, nameof(dataContext));
 
-            this.dataContext = dataContext;
+            this._dataContext = dataContext;
 
-            Logger = NullLogger.Instance;
+            this.Logger = NullLogger.Instance;
         }
 
         public T GetValue(string contextKey)
         {
-            var item = GetCurrentItem(contextKey);
+            var item = this.GetCurrentItem(contextKey);
             if (item == null)
             {
                 return default(T);
@@ -42,14 +42,14 @@ namespace MyCoreFramework.Runtime.Remoting
 
         public IDisposable BeginScope(string contextKey, T value)
         {
-            var item = new ScopeItem(value, GetCurrentItem(contextKey));
+            var item = new ScopeItem(value, this.GetCurrentItem(contextKey));
 
             if (!ScopeDictionary.TryAdd(item.Id, item))
             {
-                throw new MyCoreException("Can not set unit of work! ScopeDictionary.TryAdd returns false!");
+                throw new AbpException("Can not set unit of work! ScopeDictionary.TryAdd returns false!");
             }
 
-            this.dataContext.SetData(contextKey, item.Id);
+            this._dataContext.SetData(contextKey, item.Id);
 
             return new DisposeAction(() =>
             {
@@ -57,17 +57,17 @@ namespace MyCoreFramework.Runtime.Remoting
 
                 if (item.Outer == null)
                 {
-                    this.dataContext.SetData(contextKey, null);
+                    this._dataContext.SetData(contextKey, null);
                     return;
                 }
 
-                this.dataContext.SetData(contextKey, item.Outer.Id);
+                this._dataContext.SetData(contextKey, item.Outer.Id);
             });
         }
 
         private ScopeItem GetCurrentItem(string contextKey)
         {
-            var objKey = this.dataContext.GetData(contextKey) as string;
+            var objKey = this._dataContext.GetData(contextKey) as string;
             return objKey != null ? ScopeDictionary.GetOrDefault(objKey) : null;
         }
 
@@ -81,10 +81,10 @@ namespace MyCoreFramework.Runtime.Remoting
 
             public ScopeItem(T value, ScopeItem outer = null)
             {
-                Id = Guid.NewGuid().ToString();
+                this.Id = Guid.NewGuid().ToString();
 
-                Value = value;
-                Outer = outer;
+                this.Value = value;
+                this.Outer = outer;
             }
         }
     }

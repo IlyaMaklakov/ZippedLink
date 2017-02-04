@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 
 using MyCoreFramework.Configuration.Startup;
 using MyCoreFramework.MultiTenancy;
 
 namespace MyCoreFramework.Runtime.Session
 {
-    public abstract class AbpSessionBase : ISession
+    public abstract class AbpSessionBase : IAbpSession
     {
-        public const string SessionOverrideContextKey = "MyCoreFramework.Session.Override";
+        public const string SessionOverrideContextKey = "Abp.Runtime.Session.Override";
 
         public IMultiTenancyConfig MultiTenancy { get; }
 

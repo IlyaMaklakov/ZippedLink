@@ -1,3 +1,5 @@
+using MyCoreFramework.Domain.Entities;
+
 namespace MyCoreFramework.Domain.Uow
 {
     /// <summary>

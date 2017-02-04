@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "EntityFramework": "6.1.3",
+    "EntityFramework.DynamicFilters": "1.4.11",
+    "MyCore.EntityFramework.Common": "1.0.0-*",
+    "MyCoreFramework": "1.0.0-*"
+  },
+
+  "frameworks": {
+    "net452": {
+
+    }
+  }
+}

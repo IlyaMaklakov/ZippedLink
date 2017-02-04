@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 using MyCoreFramework.Localization;
 
@@ -32,9 +33,9 @@ namespace MyCoreFramework.Configuration
         /// </summary>
         public IReadOnlyList<SettingDefinitionGroup> Children
         {
-            get { return this.children.ToImmutableList(); }
+            get { return this._children.ToImmutableList(); }
         }
-        private readonly List<SettingDefinitionGroup> children;
+        private readonly List<SettingDefinitionGroup> _children;
 
         /// <summary>
         /// Creates a new <see cref="SettingDefinitionGroup"/> object.
@@ -50,7 +51,7 @@ namespace MyCoreFramework.Configuration
 
             this.Name = name;
             this.DisplayName = displayName;
-            this.children = new List<SettingDefinitionGroup>();
+            this._children = new List<SettingDefinitionGroup>();
         }
 
         /// <summary>
@@ -62,10 +63,10 @@ namespace MyCoreFramework.Configuration
         {
             if (child.Parent != null)
             {
-                throw new MyCoreException("Setting group " + child.Name + " has already a Parent (" + child.Parent.Name + ").");
+                throw new AbpException("Setting group " + child.Name + " has already a Parent (" + child.Parent.Name + ").");
             }
 
-            this.children.Add(child);
+            this._children.Add(child);
             child.Parent = this;
             return this;
         }

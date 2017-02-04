@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MyCoreFramework.Extensions
 {
@@ -25,7 +25,12 @@ namespace MyCoreFramework.Extensions
         /// <param name="e">Event argument</param>
         public static void InvokeSafely(this EventHandler eventHandler, object sender, EventArgs e)
         {
-            eventHandler?.Invoke(sender, e);
+            if (eventHandler == null)
+            {
+                return;
+            }
+
+            eventHandler(sender, e);
         }
 
         /// <summary>
@@ -38,7 +43,12 @@ namespace MyCoreFramework.Extensions
         public static void InvokeSafely<TEventArgs>(this EventHandler<TEventArgs> eventHandler, object sender, TEventArgs e)
             where TEventArgs : EventArgs
         {
-            eventHandler?.Invoke(sender, e);
+            if (eventHandler == null)
+            {
+                return;
+            }
+
+            eventHandler(sender, e);
         }
     }
 }

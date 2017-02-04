@@ -11,11 +11,11 @@ namespace MyCoreFramework.Domain.Uow
     /// </summary>
     internal class UnitOfWorkInterceptor : IInterceptor
     {
-        private readonly IUnitOfWorkManager unitOfWorkManager;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public UnitOfWorkInterceptor(IUnitOfWorkManager unitOfWorkManager)
         {
-            this.unitOfWorkManager = unitOfWorkManager;
+            this._unitOfWorkManager = unitOfWorkManager;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace MyCoreFramework.Domain.Uow
 
         private void PerformSyncUow(IInvocation invocation, UnitOfWorkOptions options)
         {
-            using (var uow = this.unitOfWorkManager.Begin(options))
+            using (var uow = this._unitOfWorkManager.Begin(options))
             {
                 invocation.Proceed();
                 uow.Complete();
@@ -59,7 +59,7 @@ namespace MyCoreFramework.Domain.Uow
 
         private void PerformAsyncUow(IInvocation invocation, UnitOfWorkOptions options)
         {
-            var uow = this.unitOfWorkManager.Begin(options);
+            var uow = this._unitOfWorkManager.Begin(options);
 
             invocation.Proceed();
 

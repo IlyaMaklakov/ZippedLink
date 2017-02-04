@@ -91,7 +91,7 @@ namespace MyCoreFramework.Domain.Uow
             unitOfWorkKey = value.Id;
             if (!UnitOfWorkDictionary.TryAdd(unitOfWorkKey, value))
             {
-                throw new MyCoreException("Can not set unit of work! UnitOfWorkDictionary.TryAdd returns false!");
+                throw new AbpException("Can not set unit of work! UnitOfWorkDictionary.TryAdd returns false!");
             }
 
             CallContext.LogicalSetData(ContextKey, unitOfWorkKey);

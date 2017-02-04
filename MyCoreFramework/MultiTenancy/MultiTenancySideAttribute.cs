@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MyCoreFramework.MultiTenancy
 {
@@ -18,7 +18,7 @@ namespace MyCoreFramework.MultiTenancy
         /// <param name="side">Multitenancy side.</param>
         public MultiTenancySideAttribute(MultiTenancySides side)
         {
-            Side = side;
+            this.Side = side;
         }
     }
 }

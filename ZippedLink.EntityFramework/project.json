@@ -1,0 +1,30 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "EntityFramework": "6.1.3",
+    "EntityFramework.DynamicFilters": "1.4.11",
+    "MyCore.EntityFramework": "1.0.0-*",
+    "MyCoreFramework": "1.0.0-*",
+    "NETStandard.Library": "1.6.0",
+    "ZippedLink.Core": "1.0.0-*"
+  },
+
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Configuration": "",
+        "System.Data": "",
+        "System.Transactions": "",
+        "System.Runtime": {
+          "type": "build"
+        },
+        "System.Runtime.Caching": "",
+        "System.ComponentModel.DataAnnotations": "",
+        "System.Threading.Tasks": {
+          "type": "build"
+        }
+      }
+    }
+  }
+}

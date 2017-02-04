@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using MyCoreFramework.Localization.Source;
+using MyCoreFramework.Localization.Sources;
 
 namespace MyCoreFramework.Configuration.Startup
 {

@@ -6,7 +6,7 @@ using MyCoreFramework.JetBrains.Annotations;
 namespace MyCoreFramework
 {
     [DebuggerStepThrough]
-    internal static class Check
+    public static class Check
     {
         [ContractAnnotation("value:null => halt")]
         public static T NotNull<T>(T value, [InvokerParameterName] [NotNull] string parameterName)
